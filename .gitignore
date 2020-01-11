@@ -1,3 +1,5 @@
 .gradle/*
 build/*
 setenv.sh
+/.gradle/
+/build/

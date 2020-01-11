@@ -34,7 +34,7 @@ public class SwaggerConfiguration {
 	                "Terms of service",
 	                new Contact("", "", ""),
 	               "",
-	                "");
+	                "", null);
 	        
 	        return apiInfo;
 	    }
