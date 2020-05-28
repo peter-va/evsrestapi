@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 
 import gov.nih.nci.evs.api.model.Concept;
+import gov.nih.nci.evs.api.support.es.ElasticObject;
 
 /**
  * The service for performing index related operations on Elasticsearch
@@ -17,6 +18,9 @@ public interface ElasticOperationsService {
   
   /** The type in ES for concepts **/
   public static final String CONCEPT_TYPE = "concept";
+
+  /** The type in ES for cached objects **/
+  public static final String OBJECT_TYPE = "object";
   
   /**
    * create index using the given index name
@@ -29,14 +33,24 @@ public interface ElasticOperationsService {
   boolean createIndex(String indexName, boolean force) throws IOException;
   
   /**
-   * load concepts
+   * load objects
    * 
-   * @param concepts the list of concepts
+   * @param objects the list of objects
    * @param index the index name
    * @param type the type name
    * @throws IOException the io exception
    */
-  void loadConcepts(List<Concept> concepts, String index, String type) throws IOException;
+  void bulkIndex(List<Object> objects, String index, String type, Class clazz) throws IOException;
+  
+  /**
+   * load object
+   * 
+   * @param object the object
+   * @param index the index name
+   * @param type the type name
+   * @throws IOException the io exception
+   */
+  void index(Object object, String index, String type, Class clazz) throws IOException;
   
   /**
    * get the instance of {@code ElasticsearchOperations}

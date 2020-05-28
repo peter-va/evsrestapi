@@ -14,10 +14,14 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
+import gov.nih.nci.evs.api.model.ConceptMinimal;
 import gov.nih.nci.evs.api.model.IncludeParam;
 import gov.nih.nci.evs.api.model.Terminology;
 import gov.nih.nci.evs.api.properties.StardogProperties;
+import gov.nih.nci.evs.api.service.ElasticLoadService;
+import gov.nih.nci.evs.api.service.ElasticOperationsService;
 import gov.nih.nci.evs.api.service.SparqlQueryManagerService;
+import gov.nih.nci.evs.api.support.es.ElasticObject;
 
 /**
  * Terminology cache loader to load spring cache by making calls to
@@ -41,6 +45,9 @@ public class TerminologyCacheLoader implements ApplicationListener<ApplicationRe
   @Autowired
   SparqlQueryManagerService sparqlQueryManagerService;
 
+  @Autowired
+  ElasticLoadService loadService;
+  
   @Override
   public void onApplicationEvent(ApplicationReadyEvent event) {
     log.debug("onApplicationEvent() = " + event);
@@ -67,7 +74,8 @@ public class TerminologyCacheLoader implements ApplicationListener<ApplicationRe
               log.info("    done paths ");
 
               log.info("  get contributing sources ");
-              sparqlQueryManagerService.getContributingSources(terminology);
+              List<ConceptMinimal> contributingSources = sparqlQueryManagerService.getContributingSources(terminology);
+              loadService.loadObject(new ElasticObject("contributing_sources", contributingSources), terminology);
               log.info("    done contributing sources ");
 
               log.info("  get synonym sources ");
