@@ -18,46 +18,19 @@ Information on the build and deployment process for the EVSRESTAPI project
 * Launch Elasticsearch docker container 
 In a terminal/Cygwin window, run the following to have an elasticsearch instance running. Keep this window open to keep the server running.
 
-      docker pull docker.elastic.co/elasticsearch/elasticsearch:6.4.0
+      docker pull docker.elastic.co/elasticsearch/elasticsearch:6.7.0
       # Choose a directory for your elasticsearch data to live
       dir=c:/evsrestapi/elasticsearch/data
-      docker run -p 9200:9200 -v "$dir":/usr/share/elasticsearch/data  -e "discovery.type=single-node" -e ES_JAVA_OPTS="-Xms3g -Xmx4g"  docker.elastic.co/elasticsearch/elasticsearch:6.4.0
+      docker run -p 9200:9200 -v "$dir":/usr/share/elasticsearch/data  -e "discovery.type=single-node" -e ES_JAVA_OPTS="-Xms3g -Xmx4g"  docker.elastic.co/elasticsearch/elasticsearch:6.7.0
 
 
-* Load/Compute Indexes - Run from the “elasticsearch/scripts” folder of the cloned https://github.com/NCIEVS/evsrestapi repo.
-
-      # From the root of cloned https://github.com/NCIEVS/evsrestapi
-      cd elasticsearch/scripts
-      
-      # Configure .env file
-      # NOTE: host.docker.internal refers to "localhost" of the environment running docker, 
-      #       an easy way to avoid having to network containers together.
-      cat > .env << EOF
-      API_ENDPOINT=http://host.docker.internal:8080/api/v1/concept/
-      CONCEPT_OUTPUT_DIR=/tmp/
-      CONCEPT_INPUT_DIR=/tmp/
-      ES_HOST=host.docker.internal
-      ES_PORT=9200
-      INDEX_MAPPING_FILE=../Mapping/concept_flat_full_nested_bylabel.json
-      LOG_DIRECTORY=/tmp/
-      MULTI_PROCESSING_POOL=2
-      NAMED_GRAPH=http://NCI_T
-      SPARQL_ENDPOINT=http://host.docker.internal:5820/NCIT2/query
-      STARDOG_USERNAME=admin
-      STARDOG_PASSWORD=admin
-      EOF
-
-* Run the python load script in the docker container (from the “elasticsearch” directory of the cloned project)
+* Load/Compute Indexes
 
       # From the root of cloned https://github.com/NCIEVS/evsrestapi
-      cd elasticsearch
+      # see
+      ./gradlew clean build -x test
+      SPRING_PROFILES_ACTIVE=local java -jar build/libs/evsrestapi-1.1.1.RELEASE.jar -t ncit_20.03d
       
-      docker build -t evsrestapi:elasticsearch .
-      docker run -it evsrestapi:elasticsearch
-      (base) root@b63d5d1f4038:/elasticsearch# cd scripts/
-      (base) root@b63d5d1f4038:/elasticsearch# ./bulkLoadES.py --index_name concept --download_only
-      (base) root@b63d5d1f4038:/elasticsearch# ./bulkLoadES.py --index_name concept --no_download --delete_document
-      (base) root@b63d5d1f4038:/elasticsearch# exit
 
 
 ### Steps for Building and Running EVSRESTAPI locally
@@ -68,7 +41,8 @@ In a terminal/Cygwin window, run the following to have an elasticsearch instance
 * Configure application
     * see `src/main/resources/application-local.yml` file for local setup (these settings should be suitable for local deployment)
 * Build the application (MUST DO BEFORE RUNNING if using “external tools configuration”)
-    * `SPRING_PROFILES_ACTIVE=local ./gradlew clean build`
+    * `SPRING_PROFILES_ACTIVE=local ./gradlew clean build -x test` (without tests)
+    * `SPRING_PROFILES_ACTIVE=local ./gradlew clean build` (with tests)
     * Executable war file present in build/libs
 
 * Run application in Eclipse (SpringBoot)

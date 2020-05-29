@@ -15,6 +15,7 @@ buildscript {
     }
 }
 
+// Repositories to search dependencies (in order)
 repositories {
     mavenLocal()
     jcenter()
@@ -24,31 +25,18 @@ repositories {
     mavenCentral()
 }
 
-
-/*
- * Extra Properties
- */
-ext {
-     /*
-     * Other third-party software versions
-     */
-     swaggerversion = "2.9.2"
-}
-
 apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'war'
 apply plugin: 'org.springframework.boot'
-/*
- * The dependency management plugin remains a transitive dependency of spring-boot-gradle-plugin
- * so there’s no need for it to be listed as a classpath dependency in the buildscript configuration.
- */
+// The dependency management plugin remains a transitive dependency of spring-boot-gradle-plugin
+// so there’s no need for it to be listed as a classpath dependency in the buildscript configuration.
 apply plugin: 'io.spring.dependency-management'
 apply plugin: 'maven'
 apply plugin: 'maven-publish'
 
 
-/* Version info */
+// Version info
 group = "gov.nih.nci.evs.api"
 version = "1.1.1.RELEASE"
 
@@ -68,8 +56,8 @@ dependencies {
     compile 'org.springframework.boot:spring-boot-starter-cache'
     compile 'org.apache.commons:commons-lang3:3.4'
     compile 'commons-io:commons-io:2.6'
-    compile "io.springfox:springfox-swagger2:$swaggerversion" 
-    compile "io.springfox:springfox-swagger-ui:$swaggerversion"
+    compile "io.springfox:springfox-swagger2:2.9.2"
+    compile "io.springfox:springfox-swagger-ui:2.9.2"
     compile 'org.springframework.boot:spring-boot-properties-migrator'
     compile 'org.springframework:spring-aop'
     compile 'org.aspectj:aspectjweaver:1.9.2'
@@ -81,18 +69,13 @@ dependencies {
 
     providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
 
-    /*
-     * Test Dependencies
-    */
+    // Test Dependencies
     testCompile 'org.springframework.boot:spring-boot-starter-test'
 
 }
 
 test {
-    /*
-     * Configure gradle to show standard out and standard error
-     * of the test JVM(s) on the console
-     */
+    // Configure gradle to show standard out and standard error
     testLogging.showStandardStreams = true
 }
 
@@ -125,6 +108,7 @@ task zipFile(type: Zip) {
     }
 }
 
+// Specify the start class for boot running
 bootJar {
     manifest {
     	attributes 'Start-Class': 'gov.nih.nci.evs.api.service.ElasticLoadServiceImpl'
